@@ -26,12 +26,12 @@ class SeekBar extends StatefulWidget {
   final Color progressColor;
   final Color secondProgressColor;
   final Color thumbColor;
-  final Function onStartTrackingTouch;
-  final ValueChanged<double> onProgressChanged;
-  final Function onStopTrackingTouch;
+  final Function? onStartTrackingTouch;
+  final ValueChanged<double>? onProgressChanged;
+  final Function? onStopTrackingTouch;
 
   SeekBar({
-    Key key,
+    Key? key,
     this.progressWidth = 2.0,
     this.thumbRadius = 7.0,
     this.value = 0.0,
@@ -60,33 +60,46 @@ class _SeekBarState extends State<SeekBar> {
   bool _touchDown = false;
 
   _setValue() {
-    _value = _touchPoint.dx / context.size.width;
+    if (context.size == null) _value = 0;
+    _value = _touchPoint.dx / context.size!.width;
   }
 
   _checkTouchPoint() {
-    if (_touchPoint.dx <= 0) {
+    if (_touchPoint.dx <= 0 || context.size == null) {
       _touchPoint = Offset(0, _touchPoint.dy);
     }
-    if (_touchPoint.dx >= context.size.width) {
-      _touchPoint = Offset(context.size.width, _touchPoint.dy);
+    if (_touchPoint.dx >= context.size!.width) {
+      _touchPoint = Offset(context.size!.width, _touchPoint.dy);
     }
   }
 
   @override
   void initState() {
-    _value = widget.value > 1 ? 1 : widget.value < 0 ? 0 : widget.value;
+    _value = widget.value > 1
+        ? 1
+        : widget.value < 0
+            ? 0
+            : widget.value;
     _secondValue = widget.secondValue > 1
         ? 1
-        : widget.secondValue < 0 ? 0 : widget.secondValue;
+        : widget.secondValue < 0
+            ? 0
+            : widget.secondValue;
     super.initState();
   }
 
   @override
   void didUpdateWidget(SeekBar oldWidget) {
-    _value = widget.value > 1 ? 1 : widget.value < 0 ? 0 : widget.value;
+    _value = widget.value > 1
+        ? 1
+        : widget.value < 0
+            ? 0
+            : widget.value;
     _secondValue = widget.secondValue > 1
         ? 1
-        : widget.secondValue < 0 ? 0 : widget.secondValue;
+        : widget.secondValue < 0
+            ? 0
+            : widget.secondValue;
     super.didUpdateWidget(oldWidget);
   }
 
@@ -94,7 +107,7 @@ class _SeekBarState extends State<SeekBar> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragDown: (details) {
-        RenderBox box = context.findRenderObject();
+        RenderBox box = context.findRenderObject() as RenderBox;
         _touchPoint = box.globalToLocal(details.globalPosition);
         _checkTouchPoint();
         setState(() {
@@ -102,18 +115,18 @@ class _SeekBarState extends State<SeekBar> {
           _touchDown = true;
         });
         if (widget.onStartTrackingTouch != null) {
-          widget.onStartTrackingTouch();
+          widget.onStartTrackingTouch!();
         }
       },
       onHorizontalDragUpdate: (details) {
-        RenderBox box = context.findRenderObject();
+        RenderBox box = context.findRenderObject() as RenderBox;
         _touchPoint = box.globalToLocal(details.globalPosition);
         _checkTouchPoint();
         setState(() {
           _setValue();
         });
         if (widget.onProgressChanged != null) {
-          widget.onProgressChanged(_value);
+          widget.onProgressChanged!(_value);
         }
       },
       onHorizontalDragEnd: (details) {
@@ -121,7 +134,7 @@ class _SeekBarState extends State<SeekBar> {
           _touchDown = false;
         });
         if (widget.onStopTrackingTouch != null) {
-          widget.onStopTrackingTouch();
+          widget.onStopTrackingTouch!();
         }
       },
       child: Container(
@@ -156,15 +169,15 @@ class _SeekBarPainter extends CustomPainter {
   final bool touchDown;
 
   _SeekBarPainter({
-    this.progressWidth,
-    this.thumbRadius,
-    this.value,
-    this.secondValue,
-    this.barColor,
-    this.progressColor,
-    this.secondProgressColor,
-    this.thumbColor,
-    this.touchDown,
+    required this.progressWidth,
+    required this.thumbRadius,
+    this.value = 0,
+    this.secondValue = 0,
+    required this.barColor,
+    required this.progressColor,
+    required this.secondProgressColor,
+    required this.thumbColor,
+    required this.touchDown,
   });
 
   @override
